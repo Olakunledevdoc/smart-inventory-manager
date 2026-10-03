@@ -1,0 +1,1815 @@
+{
+  "name": "Smart Inventory Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "formId": "YOUR_TALLY_FORM_ID"
+      },
+      "id": "ed728cbb-5db5-4ef3-ac6d-f40732274288",
+      "name": "Tally Trigger",
+      "type": "n8n-nodes-tallyforms.tallyTrigger",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        496
+      ],
+      "credentials": {
+        "tallyApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Tally account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "57466e7f-b199-41f3-a816-2b9d7e98fb69",
+              "name": "po_number",
+              "value": "={{ $json.question_zQ8xea.value }}",
+              "type": "string"
+            },
+            {
+              "id": "1c3cae10-eb40-4155-9d61-0dfe222c751c",
+              "name": "sku",
+              "value": "={{ $json.question_5qaB26.value }}",
+              "type": "string"
+            },
+            {
+              "id": "c0211af5-0c32-439c-b677-c36334ba15a1",
+              "name": "qty_recieved",
+              "value": "={{ $json.question_d2JWlq.value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "08c51483-a091-4383-96ef-9da3914672e1",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -352,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847992844,
+          "mode": "list",
+          "cachedResultName": "Purchase order sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1847992844"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "PO Number",
+              "lookupValue": "={{ $('Edit Fields').item.json.po_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3aeace19-2bcd-4d7f-927f-3779a2dde9f2",
+      "name": "Look Up Purchase Order",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        496
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "36e18b93-d8b7-4d6c-a708-bd052b2e43ab",
+              "leftValue": "={{ Number($('Edit Fields').item.json.qty_recieved) }}",
+              "rightValue": "={{ Number($json['Qty Ordered']) }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "76bdbf0a-c7bf-4353-afa2-7b57c323b24a",
+      "name": "Full Quantity Received?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        96,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "SKU",
+              "lookupValue": "={{ $json.SKU }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cbf27d06-fc2f-45bb-9b1e-1a965c5f9555",
+      "name": "Look Up Product (Full Delivery)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SKU": "={{ $json.SKU }}",
+            "Stock": "={{ Number ($json.Stock) + Number ($('Edit Fields').item.json.qty_recieved)}}"
+          },
+          "matchingColumns": [
+            "SKU"
+          ],
+          "schema": [
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product ",
+              "displayName": "Product ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unit Cost",
+              "displayName": "Unit Cost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stock",
+              "displayName": "Stock",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reorder Level",
+              "displayName": "Reorder Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reorder Qty",
+              "displayName": "Reorder Qty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supplier",
+              "displayName": "Supplier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supplier Email",
+              "displayName": "Supplier Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1b1a85af-0a02-4261-9451-edb4143c4860",
+      "name": "Add Delivered Qty to Stock (Full)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Look Up Product (Full Delivery)').item.json['Supplier Email'] }}",
+        "subject": "=Restock of  {{ $('Look Up Product (Full Delivery)').item.json['Product '] }} !!!!!!",
+        "emailType": "text",
+        "message": "=Hello  {{ $('Look Up Product (Full Delivery)').item.json.Supplier }}\n\n   We have just confirmed restock of anoter batch of {{ $('Look Up Product (Full Delivery)').item.json['Product '] }}\n  This purchase order is marked as {{ $('Look Up Purchase Order').item.json['PO Number'] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "91c39b01-5c87-4559-9c4e-5ad2493ed810",
+      "name": "Email Restock Confirmation to Supplier",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        400
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847992844,
+          "mode": "list",
+          "cachedResultName": "Purchase order sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1847992844"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Qty Recieved": "={{ $('Edit Fields').item.json.qty_recieved }}",
+            "Status": "Recieved",
+            "PO Number": "={{ $('Look Up Purchase Order').item.json['PO Number'] }}"
+          },
+          "matchingColumns": [
+            "PO Number"
+          ],
+          "schema": [
+            {
+              "id": "PO Number",
+              "displayName": "PO Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Supplier",
+              "displayName": "Supplier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product ",
+              "displayName": "Product ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty Ordered",
+              "displayName": "Qty Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty Recieved",
+              "displayName": "Qty Recieved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9488ffac-1a21-4920-a04c-fc09108c36b7",
+      "name": "Mark PO as Received",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847992844,
+          "mode": "list",
+          "cachedResultName": "Purchase order sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1847992844"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "PO Number",
+              "lookupValue": "={{ $('Look Up Purchase Order').item.json['PO Number'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "614341d0-c824-4090-9f67-9612bca08251",
+      "name": "Look Up PO Again (Short Delivery)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        592
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847992844,
+          "mode": "list",
+          "cachedResultName": "Purchase order sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1847992844"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "PO Number": "={{ $json['PO Number'] }}",
+            "Status": "Partially Received",
+            "Qty Recieved": "={{ $('Edit Fields').item.json.qty_recieved }}"
+          },
+          "matchingColumns": [
+            "PO Number"
+          ],
+          "schema": [
+            {
+              "id": "PO Number",
+              "displayName": "PO Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Supplier",
+              "displayName": "Supplier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product ",
+              "displayName": "Product ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty Ordered",
+              "displayName": "Qty Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty Recieved",
+              "displayName": "Qty Recieved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a7b39193-a17e-449c-b80f-45e7fbab9730",
+      "name": "Mark PO as Partially Received",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        592
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "SKU",
+              "lookupValue": "={{ $('Edit Fields').item.json.sku }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a5b77373-f14d-4829-afb0-d92b8394e2cb",
+      "name": "Look Up Product (Short Delivery)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        592
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SKU": "={{ $('Look Up PO Again (Short Delivery)').item.json.SKU }}",
+            "Stock": "={{ Number($json.Stock) + Number($('Edit Fields').item.json.qty_recieved)  }}"
+          },
+          "matchingColumns": [
+            "SKU"
+          ],
+          "schema": [
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product ",
+              "displayName": "Product ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unit Cost",
+              "displayName": "Unit Cost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stock",
+              "displayName": "Stock",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reorder Level",
+              "displayName": "Reorder Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reorder Qty",
+              "displayName": "Reorder Qty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supplier",
+              "displayName": "Supplier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supplier Email",
+              "displayName": "Supplier Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3808087c-04dd-444a-b991-12d4e86a7bf7",
+      "name": "Add Delivered Qty to Stock (Short)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        592
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Look Up Product (Short Delivery)').item.json['Supplier Email'] }}",
+        "subject": "=ACTION REQUIRED: Short Delivery on {{ $('Look Up PO Again (Short Delivery)').item.json['Product '] }} {{ $('Look Up PO Again (Short Delivery)').item.json['PO Number'] }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: auto;\">\n\n  <div style=\"background:#d32f2f; color:#ffffff; padding:14px 18px; border-radius:6px 6px 0 0;\">\n    <h2 style=\"margin:0;\">&#9888; SHORT DELIVERY ALERT</h2>\n  </div>\n\n  <div style=\"border:2px solid #d32f2f; border-top:none; padding:18px; border-radius:0 0 6px 6px;\">\n\n    <p>Hello {{ $('Look Up Purchase Order').item.json.Supplier }},</p>\n\n    <p>\n      The delivery we received for purchase order\n      <b>{{ $('Look Up Purchase Order').item.json['PO Number'] }}</b> was\n      <b style=\"color:#d32f2f;\">below the quantity ordered</b>.\n    </p>\n\n    <table border=\"1\" cellpadding=\"8\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;\">\n      <tr style=\"background:#f0f0f0;\">\n        <th align=\"left\">Product</th>\n        <th align=\"left\">SKU</th>\n        <th>Ordered</th>\n        <th>Received</th>\n        <th style=\"color:#d32f2f;\">Shortfall</th>\n      </tr>\n      <tr>\n        <td>{{ $('Look Up Purchase Order').item.json['Product '] }}</td>\n        <td>{{ $('Look Up Purchase Order').item.json.SKU }}</td>\n        <td align=\"center\">{{ $('Look Up Purchase Order').item.json['Qty Ordered'] }}</td>\n        <td align=\"center\">{{ $('Edit Fields').item.json.qty_recieved }}</td>\n        <td align=\"center\" style=\"color:#d32f2f;\"><b>{{ Number($('Look Up PO Again (Short Delivery)').item.json['Qty Ordered']) - Number($('Edit Fields').item.json.qty_recieved) }}</b></td>\n      </tr>\n    </table>\n\n    <p style=\"color:#d32f2f;\">\n      <b>\n       We are short by {{ Number($('Look Up PO Again (Short Delivery)').item.json['Qty Ordered']) - Number($('Edit Fields').item.json.qty_recieved) }} units\n       ({{ Math.round((Number($('Look Up PO Again (Short Delivery)').item.json['Qty Ordered']) - Number($('Edit Fields').item.json.qty_recieved)) / Number($('Look Up PO Again (Short Delivery)').item.json['Qty Ordered']) * 100) }}% of the order).\n      </b>\n    </p>\n\n    <p>Please reply to confirm:</p>\n    <ul>\n      <li>When the remaining units will be delivered</li>\n      <li>The reason for the shortfall</li>\n    </ul>\n\n    <p>Thank you,<br>Your Company Name</p>\n\n  </div>\n</div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "368f4b7d-13da-4f9d-a91a-fffa5836eb5d",
+      "name": "Email Short Delivery Alert to Supplier",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        592
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "224b6a32-2bae-4805-babf-256955aa0592",
+      "name": "Every Monday at 8AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -576,
+        928
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "55d3c8e3-e31a-4e4c-bd39-81e4a80c341a",
+      "name": "Get Inventory Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -352,
+        928
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1629082284,
+          "mode": "list",
+          "cachedResultName": "Sheet3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1629082284"
+        },
+        "options": {}
+      },
+      "id": "b9d81035-d5c1-4d38-b756-882b0d16d3f8",
+      "name": "Get Sales Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        928
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Trim stray spaces from column headers (e.g. \"Product \")\nconst clean = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k.trim(), v]));\n// Inventory = \"Get Inventory Data\" (Inventory sheet); Sales = \"Get Sales Data\" (Sheet3)\nconst inv = $('Get Inventory Data').all().map(i => clean(i.json));\nconst sales = $('Get Sales Data').all().map(i => clean(i.json));\nconst DAYS = 14;\n\nconst sold = {};\nfor (const s of sales) sold[s.SKU] = (sold[s.SKU] || 0) + Number(s.Qty);\n\nconst rows = inv.map(p => {\n  const stock = Number(p.Stock);\n  const level = Number(p['Reorder Level']);\n  const units = sold[p.SKU] || 0;\n  const perDay = units / DAYS;\n  const daysLeft = perDay > 0 ? Math.round(stock / perDay) : null;\n  return { sku: p.SKU, product: p.Product, stock, level, units, perDay: +perDay.toFixed(2), daysLeft };\n});\n\nreturn [{ json: {\n  lowStock: rows.filter(r => r.stock <= r.level),\n  bestSellers: [...rows].sort((a, b) => b.units - a.units).filter(r => r.units > 0).slice(0, 3),\n  runOutSoon: rows.filter(r => r.daysLeft !== null && r.daysLeft <= 14),\n  slowMoving: rows.filter(r => r.units > 0 && r.units <= 2 && r.stock > r.level * 2),\n  overstocked: rows.filter(r => r.units === 0 && r.stock > r.level * 3)\n}}];"
+      },
+      "id": "dd0d52ae-00eb-4dbb-8738-eefe3c44a0a2",
+      "name": "Calculate Inventory Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        928
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a short weekly inventory report for the business owner, in HTML (no markdown), using only the data below. Do not invent numbers.\n\nSections: Low Stock, Best Sellers, Likely to Run Out Soon, Slow-Moving, Overstocked. End with 3 recommended actions.\n\nData (last 14 days of sales):\n{{ JSON.stringify($json, null, 2) }}",
+        "options": {
+          "systemMessage": "You are an inventory analyst."
+        }
+      },
+      "id": "94bb7af8-bbff-47b2-adbe-df6d22b071f2",
+      "name": "Write Inventory Report",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        320,
+        928
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "id": "0c84b3ba-f91d-41c1-b878-807a27e2e685",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        336,
+        1152
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Get Sales Data').item.json['Order ID'] }}"
+      },
+      "id": "ae7327f7-ede8-4c5a-aee3-f7ecbe7b6c48",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        464,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "owner@example.com",
+        "subject": "Weekly Inventory Intelligence Report",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": true
+        }
+      },
+      "id": "efa0fbcd-3d59-48db-b658-70dafc62b270",
+      "name": "Email Weekly Report",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        928
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sale-received",
+        "options": {}
+      },
+      "id": "a5cae24a-0de2-49ed-a4c5-e1b1e2324557",
+      "name": "Sale Received (Webhook)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -576,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "SKU",
+              "lookupValue": "={{ $json.body.sku }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0f1a1320-6f2f-411b-83f6-6e82be7eea89",
+      "name": "Look Up Product in Inventory",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -352,
+        176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SKU": "={{ $json.SKU }}",
+            "Stock": "={{ Number($json.Stock) - Number($('Sale Received (Webhook)').item.json.body.quantity) }}"
+          },
+          "matchingColumns": [
+            "SKU"
+          ],
+          "schema": [
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product ",
+              "displayName": "Product ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stock",
+              "displayName": "Stock",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reorder Level",
+              "displayName": "Reorder Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reorder Qty",
+              "displayName": "Reorder Qty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supplier",
+              "displayName": "Supplier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supplier Email",
+              "displayName": "Supplier Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4ba28c5b-8925-40ba-94be-90d824c7eb68",
+      "name": "Deduct Sold Qty from Stock",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "acdd3f27-55b7-44b2-824f-9377edf32cca",
+              "leftValue": "={{ $json.Stock }}",
+              "rightValue": "={{ $('Look Up Product in Inventory').item.json['Reorder Level'] }}",
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "01313ac9-2209-4f1d-8ede-0463f2349858",
+      "name": "Stock At or Below Reorder Level?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        96,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Smart Inventory Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847992844,
+          "mode": "list",
+          "cachedResultName": "Purchase order sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1847992844"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "PO Number": "={{ 'PO' + $now.format('-yyyy-MMddHHmm-ss') }} }}",
+            "Date": "={{ $now.format('yyyy-MM-dd') }}",
+            "Supplier": "={{ $('Look Up Product in Inventory').item.json.Supplier }}",
+            "SKU": "={{ $('Look Up Product in Inventory').item.json.SKU }}",
+            "Qty Ordered": "={{ $('Look Up Product in Inventory').item.json['Reorder Qty'] }}",
+            "Product ": "={{ $('Look Up Product in Inventory').item.json['Product '] }}",
+            "Qty Recieved": "0",
+            "Status": "Ordered"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "PO Number",
+              "displayName": "PO Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supplier",
+              "displayName": "Supplier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Product ",
+              "displayName": "Product ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Qty Ordered",
+              "displayName": "Qty Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Qty Recieved",
+              "displayName": "Qty Recieved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "ab0598dd-fd93-4157-ae46-95511d054410",
+      "name": "Create Purchase Order",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "900e7c7a-bbbe-4706-8d5b-861f5b72a8d2",
+              "name": "po-number",
+              "value": "={{ $json['PO Number'] }}",
+              "type": "string"
+            },
+            {
+              "id": "21d2d675-f5bd-4f51-8013-fe520476fe33",
+              "name": "date",
+              "value": "={{ $json.Date }}",
+              "type": "string"
+            },
+            {
+              "id": "0ea31414-1fbb-4dd1-a32a-559cd0866643",
+              "name": "supplier",
+              "value": "={{ $json.Supplier }}",
+              "type": "string"
+            },
+            {
+              "id": "87079685-e591-41e2-92ba-5f815463de44",
+              "name": "sku",
+              "value": "={{ $json.SKU }}",
+              "type": "string"
+            },
+            {
+              "id": "e33c7d3f-4d5d-44ef-af04-13b65f2383d9",
+              "name": "product ",
+              "value": "={{ $json['Product '] }}",
+              "type": "string"
+            },
+            {
+              "id": "41884466-3f5a-4b22-b558-1ca85a816488",
+              "name": "qty",
+              "value": "={{ $json['Qty Ordered'] }}",
+              "type": "number"
+            },
+            {
+              "id": "6644792e-a26a-49a9-9db4-b36c8c0702c4",
+              "name": "unit_cost",
+              "value": "={{ $('Look Up Product in Inventory').item.json['Unit Cost'] }}",
+              "type": "number"
+            },
+            {
+              "id": "b48ef3ba-37e4-4893-ac46-63b7fa44998d",
+              "name": "total_cost",
+              "value": "={{ (Number($json['Qty Ordered']) * Number($('Look Up Product in Inventory').item.json['Unit Cost'])).toFixed(2) }}",
+              "type": "string"
+            },
+            {
+              "id": "38110c7b-9f42-48fa-9d03-8c0449277cc6",
+              "name": "Unit Cost",
+              "value": "=",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cfda05cf-43a7-45c0-838d-bce4fa47c9c1",
+      "name": "Prepare PO Email Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Look Up Product in Inventory').item.json['Supplier Email'] }}",
+        "subject": "=REQUEST FOR NEW SUPPLY OF  {{ $('Look Up Product in Inventory').item.json['Product '] }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px;\">\n  <h2>PURCHASE ORDER</h2>\n  <p>\n    <b>PO Number:</b> {{ $json['po-number'] }}<br>\n    <b>Date: </b> {{ $json.date }}<br>\n    <b>Status:</b> Ordered\n  </p>\n\n  <p>\n    <b>To:</b> {{ $json.supplier }}<br>{{ $('Look Up Product in Inventory').item.json['Supplier Email'] }}\n    \n  </p>\n\n  <table border=\"1\" cellpadding=\"8\" cellspacing=\"0\" width=\"100%\">\n    <tr style=\"background:#f0f0f0;\">\n      <th>SKU</th><th>Product</th><th>Qty</th><th>Unit Cost</th><th>Total</th>\n    </tr>\n    <tr>\n      <td>{{ $json.sku }}</td>\n      <td>{{ $json['product '] }}</td>\n      <td>{{ $json.qty }}</td>\n      <td>{{ $json.unit_cost }}</td>\n      <td>{{ $json.total_cost }}</td>\n    </tr>\n  </table>\n\n  <p><b>Total Order Value: {{ $json.total }}</b></p>\n\n  <p>Please confirm receipt of this order and the expected delivery date.</p>\n  <p>Thank you,<br>Your Company Name</p>\n</div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "16a16338-5ba6-4575-b49f-98a59fe2cc16",
+      "name": "Email PO to Supplier",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        176
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "new-purchase-orders"
+        },
+        "text": "=:warning: *Low Stock Alert*  \n*Product:* {{ $('Look Up Product in Inventory').item.json['Product '] }} \n*SKU:* {{ $('Look Up Product in Inventory').item.json.SKU }} \n*Current Stock:*{{ $('Deduct Sold Qty from Stock').item.json.Stock }} \n*Reorder Level:* {{ $('Look Up Product in Inventory').item.json['Reorder Level'] }} \n*Purchase Order:* {{ $('Create Purchase Order').item.json['PO Number'] }}\n*Supplier:* {{ $('Look Up Product in Inventory').item.json.Supplier }}\n*Quantity Ordered:* {{ $('Create Purchase Order').item.json['Qty Ordered'] }}\n*Status:* Ordered \nThe supplier has been emailed automatically.",
+        "otherOptions": {
+          "mrkdwn": false
+        }
+      },
+      "id": "da4a297d-afbe-4d35-b587-96f97bd8be6f",
+      "name": "Post Low Stock Alert to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        992,
+        176
+      ],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Starts when : a store order arrives",
+        "height": 240,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "5187e1b8-9cdb-4211-913f-45447e46b299",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Starts when:  staff submits the receiving form",
+        "height": 272,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "957fe7a8-25f0-41eb-bef5-079afe1be10b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Starts when: it is Monday 8 AM",
+        "height": 288,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "06fe825b-532a-4dad-b483-5346dd66ac8d",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Tally Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Look Up Purchase Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look Up Purchase Order": {
+      "main": [
+        [
+          {
+            "node": "Full Quantity Received?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Full Quantity Received?": {
+      "main": [
+        [
+          {
+            "node": "Look Up Product (Full Delivery)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Look Up PO Again (Short Delivery)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look Up Product (Full Delivery)": {
+      "main": [
+        [
+          {
+            "node": "Add Delivered Qty to Stock (Full)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Delivered Qty to Stock (Full)": {
+      "main": [
+        [
+          {
+            "node": "Email Restock Confirmation to Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Restock Confirmation to Supplier": {
+      "main": [
+        [
+          {
+            "node": "Mark PO as Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look Up PO Again (Short Delivery)": {
+      "main": [
+        [
+          {
+            "node": "Mark PO as Partially Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark PO as Partially Received": {
+      "main": [
+        [
+          {
+            "node": "Look Up Product (Short Delivery)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look Up Product (Short Delivery)": {
+      "main": [
+        [
+          {
+            "node": "Add Delivered Qty to Stock (Short)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Delivered Qty to Stock (Short)": {
+      "main": [
+        [
+          {
+            "node": "Email Short Delivery Alert to Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every Monday at 8AM": {
+      "main": [
+        [
+          {
+            "node": "Get Inventory Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Inventory Data": {
+      "main": [
+        [
+          {
+            "node": "Get Sales Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Inventory Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Inventory Metrics": {
+      "main": [
+        [
+          {
+            "node": "Write Inventory Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Inventory Report": {
+      "main": [
+        [
+          {
+            "node": "Email Weekly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write Inventory Report",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Write Inventory Report",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sale Received (Webhook)": {
+      "main": [
+        [
+          {
+            "node": "Look Up Product in Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look Up Product in Inventory": {
+      "main": [
+        [
+          {
+            "node": "Deduct Sold Qty from Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduct Sold Qty from Stock": {
+      "main": [
+        [
+          {
+            "node": "Stock At or Below Reorder Level?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stock At or Below Reorder Level?": {
+      "main": [
+        [
+          {
+            "node": "Create Purchase Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Purchase Order": {
+      "main": [
+        [
+          {
+            "node": "Prepare PO Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare PO Email Data": {
+      "main": [
+        [
+          {
+            "node": "Email PO to Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email PO to Supplier": {
+      "main": [
+        [
+          {
+            "node": "Post Low Stock Alert to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
