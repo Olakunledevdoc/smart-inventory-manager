@@ -1,0 +1,11 @@
+SKU,Product ,Unit Cost,Stock,Reorder Level,Reorder Qty,Supplier,Supplier Email
+NAM-42,NIke Air Max 42,500,12,5,20,ABC Footwear,olakunlephilips4@gmail.com
+TS-BLK-M,Black T-Shirt M,400,8,10,30,XYZ Apparel,olakunleautomates@gmail.com
+CAP-01,Classic Cap,500,45,10,50,Kudi Caps,omisorekehinde8@gmail.com
+HD-GRY-L,Grey Hoodie L,300,14,8,25,XYZ Apparel,olakunleautomates@gmail.com
+JN-BLU-32,Blue Jeans 32,500,9,9,20,Denim Works,olakunleautomates@gmail.com
+SK-WHT-40,White Sneakers 40,400,0,5,15,ABC Footwear,olakunlephilips4@gmail.com
+SOCK-BLK,Black Socks 3-Pack,500,220,30,100,SockHub,olakunlephilips4@gmail.com
+BP-CNV,Canvas Backpack,500,31,8,20,BagWear Ltd,olakunlephilips4@gmail.com
+WB-STL,Steel Water Bottle,400,18,12,40,HydroGoods,omisorekehinde8@gmail.com
+SG-AVT,Aviator Sunglasses,500,25,6,15,ShadeCo,olakunleautomates@gmail.com
